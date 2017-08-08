@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AppKit;
+using System.Text;
 
 public class ObjContllol : MonoBehaviour {
-
-	public SerialHandler _SerialHandler;　//SerialHandler.csの参照
+	ArduinoSerial serial;
 	Vector3 rotation;
+	public string portNum;
 	public Transform rotationObj;
 	public string massage;
 
@@ -19,56 +21,27 @@ public class ObjContllol : MonoBehaviour {
 
 	void Start()
 	{
-		_SerialHandler.SerialCallBack = SerialCallBack;
+		serial = ArduinoSerial.Instance;
+		bool success = serial.Open(portNum, ArduinoSerial.Baudrate.B_115200);
+		if (!success)
+		{
+			return;
+		}
+		serial.OnDataReceived += SerialCallBack;
+	}
+	void OnDisable()
+	{
+		serial.Close();
+		serial.OnDataReceived -= SerialCallBack;
 	}
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown (KeyCode.Space)) {
-			SerialHandler.serial.Write ("ITEM");
-		}
 	}
 
 	void SerialCallBack(string m)
 	{
-		switch (m) {
-		case "a_button":
-			print (m);
-			break;
-		case "b_button":
-			print (m);
-			break;
-		case "y_button":
-			print (m);
-			rotationObj.GetComponent<Renderer> ().material.color = Color.red;
-			break;
-		case "x_button":
-			print (m);
-			rotationObj.GetComponent<Renderer> ().material.color = Color.blue;
-			break;
-		case "up":
-			print (m);
-			objMove (MOVE_STATE.UP);
-			rotationObj.GetComponent<Renderer> ().material.color = Color.green;
-			break;
-		case "dawn":
-			print (m);
-			objMove (MOVE_STATE.DOWN);
-			rotationObj.GetComponent<Renderer> ().material.color = Color.magenta;
-			break;
-		case "left":
-			print (m);
-			objMove (MOVE_STATE.LEFT);
-			rotationObj.GetComponent<Renderer> ().material.color = Color.yellow;
-			break;
-		case "right":
-			print (m);
-			objMove (MOVE_STATE.RIGHT);
-			rotationObj.GetComponent<Renderer> ().material.color = Color.cyan;
-			break;
-		default:
-			//objRotation(m);
-			break;
-		}
+		objMove (m);
+		objRotation(m);
 		massage = m;
 	}
 
@@ -94,28 +67,68 @@ public class ObjContllol : MonoBehaviour {
 		transform.rotation = AddRot;
 	}
 
-	void objMove(MOVE_STATE state)
+	void objMove(string message)
 	{
-		switch (state) {
-		case MOVE_STATE.UP:
-			transform.SetPositionAndRotation (transform.position + (Vector3.up * 0.05f),transform.rotation );
-			break;
-		case MOVE_STATE.DOWN:
-			transform.SetPositionAndRotation (transform.position + (Vector3.down * 0.05f),transform.rotation );
-			break;
-		case MOVE_STATE.LEFT:
-			transform.SetPositionAndRotation (transform.position + (Vector3.left * 0.05f),transform.rotation );
-			break;
-		case MOVE_STATE.RIGHT:
-			transform.SetPositionAndRotation (transform.position + (Vector3.right * 0.05f),transform.rotation );
-			break;
+		string[] a;
+
+		a = message.Split("="[0]);
+		if(a.Length != 2) return;  
+		int v = int.Parse( a[1]);
+		string m = a [0];
+		if (m == "button") {
+			
+			string mc = a [1];
+
+			//a_button
+			if (mc [0] == '1') {
+				print ("a_button");
+			}
+			//b_button
+			if (mc [1] == '1') {
+				print ("b_button");
+			}
+//			//y_button
+			if (mc [2] == '1') {
+				print ("y_button");
+				rotationObj.GetComponent<Renderer> ().material.color = Color.blue;
+			}
+			//x_button
+			if (mc [3] == '1') {
+				print ("x_button");
+				rotationObj.GetComponent<Renderer> ().material.color = Color.red;
+			}
+			//up
+			if (mc [4] == '1') {
+				print ("up");
+				transform.SetPositionAndRotation (transform.position + (Vector3.up * 0.05f), transform.rotation);
+				rotationObj.GetComponent<Renderer> ().material.color = Color.green;
+			}
+			//dawn
+			if (mc [5] == '1') {
+				print ("dawn");
+				transform.SetPositionAndRotation (transform.position + (Vector3.down * 0.05f), transform.rotation);
+				rotationObj.GetComponent<Renderer> ().material.color = Color.magenta;
+			}
+			//left
+			if (mc [6] == '1') {
+				print ("left");
+				transform.SetPositionAndRotation (transform.position + (Vector3.left * 0.05f), transform.rotation);
+				rotationObj.GetComponent<Renderer> ().material.color = Color.yellow;
+			}
+			//right
+			if (mc [7] == '1') {
+				print ("right");
+				transform.SetPositionAndRotation (transform.position + (Vector3.right * 0.05f), transform.rotation);
+				rotationObj.GetComponent<Renderer> ().material.color = Color.cyan;
+			}
+
 		}
 	}
 
 	void OnTriggerEnter(Collider co)
 	{
 		Destroy (co.gameObject);
-		SerialHandler.serial.Write ("ITEM");
+		serial.Write ("ITEM");
 		Debug.LogError("item_get");
 	}
 }

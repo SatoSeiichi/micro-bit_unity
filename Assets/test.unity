@@ -315,7 +315,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392a9982513442d4d983a1d429e25360, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _SerialHandler: {fileID: 1092541762}
+  portNum: COM3
   rotationObj: {fileID: 1666589389}
   massage: 
 --- !u!65 &1010939537
@@ -357,7 +357,6 @@ GameObject:
   - component: {fileID: 1092541765}
   - component: {fileID: 1092541764}
   - component: {fileID: 1092541763}
-  - component: {fileID: 1092541762}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -365,19 +364,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1092541762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1092541761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8504a72434f3904088ff020ab0e5575, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portName: COM3
-  baudRate: 115200
 --- !u!81 &1092541763
 AudioListener:
   m_ObjectHideFlags: 0
